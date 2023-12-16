@@ -14,13 +14,16 @@ const zod_1 = require("zod");
 const standalone_1 = require("@trpc/server/adapters/standalone");
 const todoInputType = zod_1.z.object({
     title: zod_1.z.string(),
-    description: zod_1.z.string(),
+    //   description: z.string(),
 });
 const appRouter = (0, trpc_1.router)({
     createTodo: trpc_1.publicProcedure.input(todoInputType).mutation((opts) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("Hi there");
-        const title = opts.input.title;
-        const description = opts.input.description;
+        //context
+        const username = opts.ctx.username;
+        console.log(username);
+        // const title = opts.input.title;
+        // const description = opts.input.description;
         //do DB stuff here
         return {
             id: "1",
@@ -45,5 +48,14 @@ const appRouter = (0, trpc_1.router)({
 });
 const server = (0, standalone_1.createHTTPServer)({
     router: appRouter,
+    //every time requests comes , control should first reach here
+    createContext(opts) {
+        let authHeader = opts.req.headers["authorization"];
+        console.log(authHeader);
+        //jwt.verify()
+        return {
+            username: undefined,
+        };
+    },
 });
 server.listen(3000);

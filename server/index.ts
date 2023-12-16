@@ -4,14 +4,18 @@ import { createHTTPServer } from "@trpc/server/adapters/standalone";
 
 const todoInputType = z.object({
   title: z.string(),
-  description: z.string(),
+  //   description: z.string(),
 });
 
 const appRouter = router({
   createTodo: publicProcedure.input(todoInputType).mutation(async (opts) => {
     console.log("Hi there");
-    const title = opts.input.title;
-    const description = opts.input.description;
+
+    //context
+    const username = opts.ctx.username;
+    console.log(username);
+    // const title = opts.input.title;
+    // const description = opts.input.description;
 
     //do DB stuff here
 
@@ -42,6 +46,15 @@ const appRouter = router({
 
 const server = createHTTPServer({
   router: appRouter,
+  //every time requests comes , control should first reach here
+  createContext(opts) {
+    let authHeader = opts.req.headers["authorization"];
+    console.log(authHeader);
+    //jwt.verify()
+    return {
+      username: undefined,
+    };
+  },
 });
 
 server.listen(3000);
